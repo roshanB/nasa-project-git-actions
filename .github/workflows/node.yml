@@ -6,12 +6,19 @@ on: #on push to master / pr to master
     branches: [ master ]
 jobs:
   build:
+    env: #env variables that can be accessed while running the job
+      CI: true
+      #PORT: 9000
+    strategy: 
+      matrix:
+        node-version: [14.x, 16.x] #build will run parallely (the steps) for these versions
     runs-on: ubuntu-latest
     steps: #reusable actions / scripts
       - uses: actions/checkout@v2
-      - name: Use Node.js version 16 #optionally we can give name to the task
+      - name: Use Node.js version ${{ matrix.node-version }} #optionally we can give name to the task
         uses: actions/setup-node@v2
         with: #options for above action
-          node-version: '16'
+          node-version: ${{ matrix.node-version }} #'16'
       - run: npm install #run our own commands
       - run: npm run build --prefix client
+      - run: npm test 
