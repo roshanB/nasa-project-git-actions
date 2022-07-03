@@ -8,10 +8,12 @@ jobs:
   build:
     env: #env variables that can be accessed while running the job
       CI: true
+      MONGO_URL: mongodb://localhost/nasa #dbname, it will be created
       #PORT: 9000
     strategy: 
       matrix:
         node-version: [14.x, 16.x] #build will run parallely (the steps) for these versions
+        mongodb-version: ['4.4']
     runs-on: ubuntu-latest
     steps: #reusable actions / scripts
       - uses: actions/checkout@v2
@@ -19,6 +21,10 @@ jobs:
         uses: actions/setup-node@v2
         with: #options for above action
           node-version: ${{ matrix.node-version }} #'16'
+      - name: Use MongoDB from GitHub actions
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
       - run: npm install #run our own commands
       - run: npm run build --prefix client
       - run: npm test 
